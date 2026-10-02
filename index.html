@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>¡Jose cumple 7! Invitación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Press+Start+2P&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --sky-top: #1b2a8f;
+    --sky-mid: #4b2bbf;
+    --sky-low: #12b5e8;
+    --gold: #ffd23a;
+    --gold-dark: #e59a00;
+    --pink: #ff4fa3;
+    --mint: #3ff2b4;
+    --ink: #1a1240;
+    --paper: #ffffff;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background:
+      linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 24px 24px,
+      linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px) 0 0 / 24px 24px,
+      radial-gradient(120% 80% at 50% 0%, #3b1477 0%, #160a33 60%, #07051a 100%);
+    color: var(--paper);
+    font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    user-select: none;
+  }
+
+  /* Bloques flotantes de fondo */
+  .sky { position: fixed; inset: 0; pointer-events: none; perspective: 700px; }
+  .cube {
+    position: absolute; width: var(--s); height: var(--s);
+    transform-style: preserve-3d;
+    animation: spin var(--d) linear infinite, bob 6s ease-in-out infinite alternate;
+    opacity: .85;
+  }
+  .cube i {
+    position: absolute; inset: 0; border-radius: 4px;
+    border: 2px solid rgba(255,255,255,.35);
+  }
+  .cube i:nth-child(1){ transform: translateZ(calc(var(--s)/2)); background: var(--c); }
+  .cube i:nth-child(2){ transform: rotateY(180deg) translateZ(calc(var(--s)/2)); background: var(--c); }
+  .cube i:nth-child(3){ transform: rotateY(90deg) translateZ(calc(var(--s)/2)); background: color-mix(in srgb, var(--c) 75%, #000); }
+  .cube i:nth-child(4){ transform: rotateY(-90deg) translateZ(calc(var(--s)/2)); background: color-mix(in srgb, var(--c) 75%, #000); }
+  .cube i:nth-child(5){ transform: rotateX(90deg) translateZ(calc(var(--s)/2)); background: color-mix(in srgb, var(--c) 80%, #fff); }
+  .cube i:nth-child(6){ transform: rotateX(-90deg) translateZ(calc(var(--s)/2)); background: color-mix(in srgb, var(--c) 60%, #000); }
+  @keyframes spin { to { rotate: 1 1 0 360deg; } }
+  @keyframes bob { from { translate: 0 0; } to { translate: 0 -24px; } }
+
+  /* Escena de la tarjeta */
+  .stage {
+    position: relative;
+    width: min(86vw, 360px);
+    aspect-ratio: 3 / 4.6;
+    max-height: 76vh;
+    perspective: 1100px;
+    z-index: 2;
+  }
+  .card {
+    position: absolute; inset: 0;
+    transform-style: preserve-3d;
+    will-change: transform;
+    cursor: grab;
+  }
+  .card:active { cursor: grabbing; }
+  .face {
+    position: absolute; inset: 0;
+    border-radius: 28px;
+    overflow: hidden;
+    transform-style: flat;
+    box-shadow: 0 30px 60px rgba(5, 5, 40, .55);
+  }
+  .face.is-hidden { visibility: hidden; }
+  .edge {
+    position: absolute; inset: 6px; border-radius: 26px;
+    background: var(--gold-dark);
+  }
+  .edge.e1 { transform: translateZ(-3px); }
+  .edge.e2 { transform: translateZ(-6px); }
+  .edge.e3 { transform: translateZ(-9px); background: #b87600; }
+
+  .front {
+    transform: translateZ(1px);
+    background: linear-gradient(180deg, #120a3a 0%, #3b1477 38%, #a1237a 56%, #ff7a3d 64%, #1a0b33 64.2%, #0a0620 100%);
+    color: #fff;
+    border: 5px solid #fff;
+  }
+  .world { position: absolute; inset: 0; overflow: hidden; }
+  .stars {
+    position: absolute; inset: 0 0 40% 0;
+    background-image:
+      radial-gradient(2px 2px at 12% 18%, #fff 50%, transparent 51%),
+      radial-gradient(2px 2px at 78% 10%, #fff 50%, transparent 51%),
+      radial-gradient(3px 3px at 88% 30%, #ffd23a 50%, transparent 51%),
+      radial-gradient(2px 2px at 30% 34%, #fff 50%, transparent 51%),
+      radial-gradient(2px 2px at 60% 22%, #3ff2b4 50%, transparent 51%),
+      radial-gradient(2px 2px at 8% 44%, #fff 50%, transparent 51%),
+      radial-gradient(2px 2px at 48% 8%, #fff 50%, transparent 51%);
+    animation: twinkle 2.4s steps(2) infinite;
+  }
+  @keyframes twinkle { 50% { opacity: .55; } }
+  .sun {
+    position: absolute; left: 50%; top: 40%; width: 64%; aspect-ratio: 1;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background:
+      repeating-linear-gradient(180deg, transparent 0 58%, #3b1477 58% 61%, transparent 61% 68%, #3b1477 68% 72%, transparent 72% 78%, #3b1477 78% 83%, transparent 83%),
+      linear-gradient(180deg, #ffe066 0%, #ff9a3d 55%, #ff4fa3 100%);
+    -webkit-mask: linear-gradient(180deg, #000 0 60%, transparent 60.5%);
+            mask: linear-gradient(180deg, #000 0 60%, transparent 60.5%);
+    box-shadow: 0 0 60px rgba(255,120,80,.6);
+    opacity: .9;
+  }
+  .floor {
+    position: absolute; left: -50%; right: -50%; top: 64%; bottom: -10%;
+    perspective: 260px; perspective-origin: 50% 0%;
+  }
+  .floor::before {
+    content: ""; position: absolute; inset: 0 0 -200% 0;
+    transform-origin: 50% 0; transform: rotateX(62deg);
+    background:
+      linear-gradient(90deg, rgba(63,242,180,.85) 2px, transparent 2px) 0 0 / 36px 36px,
+      linear-gradient(0deg, rgba(63,242,180,.85) 2px, transparent 2px) 0 0 / 36px 36px;
+    animation: run 1.1s linear infinite;
+  }
+  @keyframes run { to { background-position: 0 36px, 0 36px; } }
+  .floor::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(10,6,32,.0) 0%, rgba(10,6,32,.15) 30%, rgba(10,6,32,.85) 100%);
+  }
+  .hud {
+    position: absolute; width: 22px; height: 22px; border: 0 solid var(--mint); z-index: 1;
+  }
+  .hud.tl { top: 44px; left: 10px; border-width: 3px 0 0 3px; }
+  .hud.tr { top: 44px; right: 10px; border-width: 3px 3px 0 0; }
+  .hud.bl { bottom: 10px; left: 10px; border-width: 0 0 3px 3px; }
+  .hud.br { bottom: 10px; right: 10px; border-width: 0 3px 3px 0; }
+  .front-inner {
+    position: relative; z-index: 2; height: 100%;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 14px 14px;
+    transform-style: flat;
+  }
+  .ribbon {
+    font-family: "Lilita One", sans-serif; font-size: 1rem; letter-spacing: .04em;
+    background: #fff; color: var(--ink);
+    padding: 5px 26px 7px; border-radius: 0 0 14px 14px;
+  }
+  .toprow {
+    width: 100%; display: flex; justify-content: space-between; align-items: flex-start;
+    margin-top: 10px;
+  }
+  .datebadge {
+    background: #fff; color: var(--ink); border-radius: 10px; overflow: hidden;
+    text-align: center; box-shadow: 0 5px 0 rgba(0,0,0,.4); min-width: 82px;
+  }
+  .datebadge .num { font-family: "Lilita One", sans-serif; font-size: 2.3rem; line-height: 1; padding: 4px 8px 0; }
+  .datebadge .num small { font-size: 1rem; }
+  .datebadge .dow { background: #ff7a00; color: #fff; font-family: "Lilita One", sans-serif; font-size: 1rem; padding: 2px 6px 4px; }
+  .hours { text-align: right; font-weight: 900; font-size: .72rem; line-height: 1.1; background: rgba(0,0,0,.55); border-radius: 10px; padding: 6px 9px; }
+  .hours:empty { display: none; }
+  .hours b { display: block; font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.4rem; color: var(--gold); }
+
+  .hero {
+    position: relative; flex: 1; width: 100%;
+    display: flex; align-items: center; justify-content: center;
+    transform-style: flat;
+  }
+  .emblem { width: 62%; max-width: 200px; filter: drop-shadow(0 12px 18px rgba(0,0,0,.6)); animation: float 3.5s ease-in-out infinite; }
+  @keyframes float { 50% { translate: 0 -10px; } }
+  .drop { position: absolute; width: 54px; animation: fall 5s ease-in-out infinite; }
+  .drop.d1 { left: 4%; top: 6%; }
+  .drop.d2 { right: 4%; top: 18%; width: 46px; animation-delay: -2.5s; }
+  @keyframes fall { 0%,100% { translate: 0 0; rotate: -6deg; } 50% { translate: 0 14px; rotate: 6deg; } }
+
+  .banner {
+    position: relative; width: 108%; margin-top: -6px;
+    transform: rotate(-3deg);
+    text-align: center; padding: 10px 0 12px;
+  }
+  .banner::before {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, #ffb000, #ff6a00);
+    clip-path: polygon(2% 12%, 12% 0, 30% 8%, 52% 1%, 74% 9%, 96% 0, 100% 40%, 97% 88%, 80% 100%, 58% 92%, 36% 100%, 14% 93%, 0 100%, 3% 55%);
+    box-shadow: 0 0 0 4px #fff;
+  }
+  .banner .name {
+    position: relative; font-family: "Lilita One", sans-serif;
+    font-size: clamp(2.6rem, 13vw, 3.3rem); line-height: 1; color: #fff;
+    -webkit-text-stroke: 3px #3a1700; paint-order: stroke fill; text-shadow: 0 5px 0 #3a1700;
+  }
+  .cumple {
+    font-family: "Lilita One", sans-serif; font-size: 1.6rem; line-height: 1;
+    margin-top: 8px;
+    text-shadow: 0 3px 0 #000;
+  }
+  .flip-tip { font-size: .78rem; font-weight: 900; opacity: .8; margin-top: 8px; }
+
+  .back {
+    transform: rotateY(180deg);
+    background:
+      radial-gradient(70% 40% at 50% 30%, rgba(255,140,0,.55) 0%, transparent 70%),
+      linear-gradient(180deg, #14151f 0%, #1c1d2b 55%, #0f0f16 100%);
+    color: #fff;
+    border: 5px solid #fff;
+  }
+  /* Reverso */
+  .back-inner {
+    position: relative; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; gap: 14px;
+    padding: 22px 18px;
+  }
+  .back .note { margin-top: 6px; }
+  .pin {
+    width: 92px; height: 92px;
+    filter: drop-shadow(0 8px 0 rgba(0,0,0,.25));
+    animation: hop 1.6s ease-in-out infinite;
+  }
+  @keyframes hop { 50% { translate: 0 -10px; } }
+  .back h2 {
+    font-family: "Lilita One", sans-serif;
+    font-size: 2.2rem; margin: 0; line-height: 1;
+    -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill;
+    text-shadow: 0 4px 0 var(--ink);
+  }
+  .address {
+    background: #fff; color: var(--ink);
+    border-radius: 20px; padding: 16px 14px; width: 100%;
+    box-shadow: 0 7px 0 rgba(10,10,60,.35);
+  }
+  .address .street {
+    font-family: "Lilita One", sans-serif;
+    font-size: clamp(1.6rem, 8vw, 2rem); line-height: 1.05;
+  }
+  .map-btn {
+    display: inline-block; margin-top: 12px;
+    font-family: "Lilita One", sans-serif; font-size: 1.1rem;
+    color: var(--ink); text-decoration: none;
+    background: var(--gold);
+    padding: 10px 20px; border-radius: 14px;
+    box-shadow: 0 5px 0 var(--gold-dark);
+  }
+  .map-btn:active { translate: 0 3px; box-shadow: 0 2px 0 var(--gold-dark); }
+  .map-btn:focus-visible { outline: 3px solid var(--pink); outline-offset: 3px; }
+  .note {
+    font-weight: 900; font-size: 1.05rem; line-height: 1.35;
+  }
+  .note strong { color: var(--gold); font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.4rem; display: block; }
+
+  /* Controles */
+  .hint {
+    position: relative; z-index: 3;
+    margin-top: 22px;
+    display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center;
+    padding: 0 16px;
+  }
+  .hint p { margin: 0; font-weight: 700; font-size: .9rem; opacity: .85; }
+  .btn {
+    font-family: "Lilita One", "Nunito", sans-serif; font-size: 1rem;
+    border: 0; border-radius: 14px; padding: 10px 18px;
+    background: var(--pink); color: #fff;
+    box-shadow: 0 5px 0 #b3236d;
+    cursor: pointer;
+  }
+  .btn.alt { background: var(--mint); color: var(--ink); box-shadow: 0 5px 0 #18a676; }
+  .btn:active { translate: 0 3px; box-shadow: 0 2px 0 #b3236d; }
+  .btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+  /* Confeti */
+  .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 4; }
+
+
+  /* Pantalla de inicio del juego */
+  .start {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    padding: 24px;
+    padding-top: calc(24px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    background:
+      radial-gradient(60% 40% at 50% 42%, rgba(255,122,0,.55) 0%, transparent 70%),
+      linear-gradient(180deg, #221a4d 0%, #0d0c1c 100%);
+    text-align: center;
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .start.gone { opacity: 0; transform: scale(1.15); pointer-events: none; }
+  .start .studio { font-weight: 900; font-size: .85rem; opacity: .7; }
+  .logo { line-height: .9; }
+  .logo .l1 {
+    display: block; font-family: "Lilita One", sans-serif; font-size: clamp(2.2rem, 11vw, 3rem);
+    color: #fff; -webkit-text-stroke: 3px #3a1700; paint-order: stroke fill; text-shadow: 0 5px 0 #3a1700;
+  }
+  .logo .l2 {
+    display: inline-block; margin-top: 8px;
+    font-family: "Lilita One", sans-serif; font-size: clamp(3.4rem, 20vw, 5rem);
+    background: linear-gradient(180deg, #fff1a8, #ffc400 50%, #ff7a00);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 6px 0 #3a1700);
+    transform: rotate(-4deg);
+  }
+  .play {
+    font-family: "Lilita One", sans-serif; font-size: 1.5rem;
+    border: 4px solid #fff; border-radius: 18px;
+    padding: 14px 34px; cursor: pointer;
+    background: linear-gradient(180deg, #ffd23a, #ff9500); color: #3a1700;
+    box-shadow: 0 7px 0 #b35a00, 0 0 40px rgba(255,170,0,.55);
+    animation: pulse 1.3s ease-in-out infinite;
+  }
+  .play:focus-visible { outline: 3px solid var(--mint); outline-offset: 4px; }
+  @keyframes pulse { 50% { transform: scale(1.06); } }
+  .loading { width: min(70vw, 260px); display: none; }
+  .loading.on { display: block; }
+  .loading .bar { height: 16px; border-radius: 9px; background: #000; padding: 3px; border: 2px solid #fff; }
+  .loading .fill { height: 100%; width: 0; border-radius: 6px; background: repeating-linear-gradient(110deg, var(--mint) 0 10px, #19d494 10px 20px); transition: width 1.3s cubic-bezier(.3,.7,.3,1); }
+  .loading p { margin: 8px 0 0; font-weight: 900; font-size: .9rem; }
+  .players { font-weight: 900; font-size: .85rem; color: var(--mint); }
+
+  /* Cuenta regresiva en la tarjeta */
+  .countdown {
+    margin-top: 10px; width: 100%;
+    background: rgba(0,0,0,.55); border: 2px solid rgba(255,255,255,.7); border-radius: 14px;
+    padding: 6px 8px 8px;
+  }
+  .countdown .t { font-size: .72rem; font-weight: 900; color: var(--mint); }
+  .countdown .digits { display: flex; justify-content: center; gap: 6px; margin-top: 2px; }
+  .countdown .u { min-width: 48px; }
+  .countdown .u b { display: block; font-family: "Lilita One", sans-serif; font-weight: 400; font-size: 1.45rem; line-height: 1; color: var(--gold); }
+  .countdown .u span { font-size: .62rem; font-weight: 900; opacity: .85; }
+
+
+  /* ===== Variantes de fondo ===== */
+  .w-layer { position: absolute; inset: 0; display: none; }
+  body[data-bg="arcade"] .w-arcade,
+  body[data-bg="pixel"] .w-pixel,
+  body[data-bg="space"] .w-space,
+  body[data-bg="city"] .w-city { display: block; }
+  body:not([data-bg="arcade"]) .front { background: #0a0620; }
+  body[data-bg="retro"] .front { background: #000; }
+
+  /* Pixel art: cerros escalonados */
+  .w-pixel { background: linear-gradient(180deg, #2bb3ff 0%, #7fd8ff 55%, #ffd9a0 70%); image-rendering: pixelated; }
+  .px-cloud { position: absolute; width: 8px; height: 8px; background: #fff;
+    box-shadow: 8px 0 #fff, 16px 0 #fff, 24px 0 #fff, -8px 8px #fff, 0 8px #fff, 8px 8px #fff, 16px 8px #fff, 24px 8px #fff, 32px 8px #fff, 8px -8px #fff, 16px -8px #fff;
+    animation: cloud 18s linear infinite; }
+  .px-cloud.c1 { top: 12%; left: 10%; }
+  .px-cloud.c2 { top: 26%; left: 70%; animation-duration: 24s; transform: scale(1.4); }
+  @keyframes cloud { from { translate: -40px 0; } to { translate: 60px 0; } }
+  .px-hills { position: absolute; left: 0; right: 0; bottom: 0; height: 48%;
+    background:
+      linear-gradient(#5b2bbf,#5b2bbf) 0 32px / 25% 100% no-repeat,
+      linear-gradient(#5b2bbf,#5b2bbf) 25% 0 / 25% 100% no-repeat,
+      linear-gradient(#5b2bbf,#5b2bbf) 50% 48px / 25% 100% no-repeat,
+      linear-gradient(#5b2bbf,#5b2bbf) 100% 16px / 25% 100% no-repeat; }
+  .px-hills.front-hills { height: 36%;
+    background:
+      linear-gradient(#ff7a00,#ff7a00) 0 0 / 100% 12px no-repeat,
+      linear-gradient(#12a37a,#12a37a) 0 12px / 100% 100% no-repeat; }
+  .px-hills.front-hills::before { content: ""; position: absolute; inset: 12px 0 0 0;
+    background: linear-gradient(90deg, rgba(0,0,0,.12) 50%, transparent 50%) 0 0 / 24px 24px,
+                linear-gradient(0deg, rgba(0,0,0,.12) 50%, transparent 50%) 0 0 / 24px 24px; }
+
+  /* Espacio */
+  .w-space { background: radial-gradient(80% 50% at 70% 20%, #3b1477 0%, transparent 70%), radial-gradient(60% 40% at 10% 80%, #0f4a8a 0%, transparent 70%), #05031a; }
+  .w-space .stars { inset: 0; }
+  .planet { position: absolute; right: -12%; top: 6%; width: 46%; aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffd23a, #ff4fa3 60%, #6a1a7a 100%);
+    box-shadow: 0 0 40px rgba(255,79,163,.5); }
+  .planet::after { content: ""; position: absolute; left: -30%; right: -30%; top: 42%; height: 16%;
+    border: 4px solid rgba(63,242,180,.9); border-radius: 50%; transform: rotate(-18deg); }
+  .moon { position: absolute; left: 8%; bottom: 14%; width: 22%; aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #c9d6ff, #6b7bb8 70%); }
+  .rocket { position: absolute; left: 12%; top: 40%; font-size: 0; width: 26px; height: 48px;
+    animation: zoom 4s ease-in-out infinite; }
+  @keyframes zoom { 50% { translate: 10px -16px; rotate: 8deg; } }
+
+  /* Ciudad gamer */
+  .w-city { background: linear-gradient(180deg, #0b0630 0%, #2a0d5a 50%, #ff4fa3 78%, #1a0b33 78.3%); }
+  .skyline { position: absolute; left: 0; right: 0; bottom: 22%; height: 46%;
+    background:
+      linear-gradient(#140a35,#140a35) 2% 100% / 14% 70% no-repeat,
+      linear-gradient(#140a35,#140a35) 18% 100% / 12% 95% no-repeat,
+      linear-gradient(#140a35,#140a35) 32% 100% / 16% 55% no-repeat,
+      linear-gradient(#140a35,#140a35) 50% 100% / 12% 100% no-repeat,
+      linear-gradient(#140a35,#140a35) 64% 100% / 14% 65% no-repeat,
+      linear-gradient(#140a35,#140a35) 80% 100% / 10% 85% no-repeat,
+      linear-gradient(#140a35,#140a35) 98% 100% / 14% 60% no-repeat; }
+  .windows { position: absolute; left: 0; right: 0; bottom: 22%; height: 40%;
+    background: radial-gradient(2px 3px at 50% 50%, #ffd23a 60%, transparent 61%) 0 0 / 14px 16px;
+    -webkit-mask: linear-gradient(#000,#000) 2% 100% / 14% 70% no-repeat, linear-gradient(#000,#000) 18% 100% / 12% 95% no-repeat, linear-gradient(#000,#000) 50% 100% / 12% 100% no-repeat, linear-gradient(#000,#000) 80% 100% / 10% 85% no-repeat;
+            mask: linear-gradient(#000,#000) 2% 100% / 14% 70% no-repeat, linear-gradient(#000,#000) 18% 100% / 12% 95% no-repeat, linear-gradient(#000,#000) 50% 100% / 12% 100% no-repeat, linear-gradient(#000,#000) 80% 100% / 10% 85% no-repeat;
+    animation: twinkle 3s steps(2) infinite; }
+  .road { position: absolute; left: 0; right: 0; bottom: 0; height: 22%;
+    background: linear-gradient(90deg, #ff4fa3 0 40%, transparent 40%) 0 50% / 40px 4px repeat-x, #120828; }
+
+
+  /* Retro 8 bits */
+  body[data-bg="retro"] .w-retro { display: block; }
+  .w-retro { background: #000; }
+  .w-retro .stars { inset: 0 0 30% 0; }
+  .retro-hud {
+    position: absolute; left: 0; right: 0; top: 38px; z-index: 1;
+    display: flex; justify-content: space-between; padding: 0 16px;
+    font-family: "Press Start 2P", ui-monospace, monospace; font-size: 8px; line-height: 1.6; color: #fff;
+  }
+  .retro-hud .r { text-align: right; }
+  .retro-hud b { color: var(--gold); font-weight: 400; }
+  .lives { display: flex; gap: 3px; margin-top: 4px; justify-content: flex-end; }
+  .heart { width: 10px; height: 10px; }
+  .px-ground { position: absolute; left: 0; right: 0; bottom: 0; height: 9%;
+    background:
+      linear-gradient(#9b6bff,#9b6bff) 0 0 / 100% 6px no-repeat,
+      linear-gradient(90deg, #2a1d5c 0 46%, #3a2a7a 46% 50%, #2a1d5c 50% 96%, #3a2a7a 96%) 0 6px / 32px 16px,
+      #2a1d5c; }
+  .sprite { position: absolute; bottom: 9%; left: 0; width: 34px; height: 34px; z-index: 1;
+    animation: walk 7s linear infinite, hopx .5s steps(2) infinite; }
+  @keyframes walk { from { left: -12%; } to { left: 104%; } }
+  @keyframes hopx { 50% { translate: 0 -4px; } }
+  .coin { position: absolute; width: 14px; height: 14px; animation: coinspin .8s steps(2) infinite; }
+  .coin.k1 { left: 10%; top: 40%; } .coin.k2 { left: 16%; top: 46%; } .coin.k3 { right: 16%; top: 40%; } .coin.k4 { right: 10%; top: 46%; }
+  @keyframes coinspin { 50% { transform: scaleX(.3); } }
+  .scan { position: absolute; inset: 0; pointer-events: none; z-index: 0;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.05) 0 1px, transparent 1px 3px); }
+  .press { position: absolute; left: 0; right: 0; bottom: 4%; text-align: center; z-index: 1;
+    font-family: "Press Start 2P", ui-monospace, monospace; font-size: 8px; color: #fff;
+    animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  body[data-bg="retro"] .hud { display: none; }
+  body[data-bg="retro"] .drop { display: none; }
+  body[data-bg="retro"] .cumple, body[data-bg="retro"] .countdown .u b { font-family: "Press Start 2P", ui-monospace, monospace; }
+  body[data-bg="retro"] .cumple { font-size: 1.05rem; margin-top: 12px; }
+  body[data-bg="retro"] .countdown .u b { font-size: .95rem; margin-bottom: 4px; }
+  body[data-bg="retro"] .countdown { border-radius: 0; border-style: double; border-width: 4px; }
+  body[data-bg="retro"] .datebadge { border-radius: 0; }
+  body[data-bg="retro"] .toprow { margin-top: 30px; }
+  body[data-bg="retro"] .emblem { width: 42%; }
+  body[data-bg="retro"] .hours { margin-top: 22px; }
+  body[data-bg="retro"] .countdown { margin-top: 6px; }
+  body[data-bg="retro"] .flip-tip { margin-top: 4px; }
+  body[data-bg="retro"] .banner { margin-top: -14px; }
+
+
+  /* El reverso usa el mismo mundo que el frente */
+  .back-inner { z-index: 2; }
+  .back .retro-hud { display: none; }
+  body:not([data-bg="arcade"]) .back { background: #0a0620; }
+  body[data-bg="arcade"] .back { background: linear-gradient(180deg, #120a3a 0%, #3b1477 38%, #a1237a 56%, #ff7a3d 64%, #1a0b33 64.2%, #0a0620 100%); }
+  body[data-bg="retro"] .back { background: #000; }
+  .back .note { background: rgba(0,0,0,.55); border-radius: 14px; padding: 8px 12px; }
+  body[data-bg="retro"] .back h2, body[data-bg="retro"] .back .note strong { font-family: "Press Start 2P", ui-monospace, monospace; font-size: 1.15rem; -webkit-text-stroke: 0; text-shadow: 3px 3px 0 #ff4fa3; }
+  body[data-bg="retro"] .back .note strong { font-size: .9rem; text-shadow: none; margin-bottom: 6px; }
+  body[data-bg="retro"] .address, body[data-bg="retro"] .map-btn, body[data-bg="retro"] .back .note { border-radius: 0; }
+  body[data-bg="retro"] .address { border: 4px double var(--ink); }
+
+  /* Selector de fondos */
+  .picker { position: relative; z-index: 3; margin-top: 16px; text-align: center; padding: 0 12px; }
+  .picker p { margin: 0 0 8px; font-weight: 900; font-size: .9rem; }
+  .picker .opts { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .opt { font-family: "Lilita One", sans-serif; font-size: .95rem; border: 3px solid transparent; border-radius: 12px;
+    padding: 7px 12px; background: #2a1d5c; color: #fff; cursor: pointer; }
+  .opt[aria-pressed="true"] { border-color: var(--gold); background: #4a2bbf; }
+  .opt:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .play { animation: none; }
+    .cube, .pin, .emblem, .drop, .stars, .floor::before, .px-cloud, .rocket, .windows, .sprite, .coin, .press { animation: none; }
+    .xp-fill { animation: none; width: 100%; }
+  }
+</style>
+</head>
+<body data-bg="retro">
+
+<div class="sky" id="sky" aria-hidden="true"></div>
+
+<div class="start" id="start">
+  <div class="studio">Una invitación especial</div>
+  <div class="logo"><span class="l1">La Fiesta de Jose</span><span class="l2">NIVEL 7</span></div>
+  <div class="players">1 lugar reservado para ti</div>
+  <button class="play" id="playBtn" type="button">Toca para jugar</button>
+  <div class="loading" id="loading"><div class="bar"><div class="fill" id="loadFill"></div></div><p id="loadText">Cargando partida...</p></div>
+</div>
+
+<main class="stage" id="stage" aria-label="Invitación al cumpleaños de Jose">
+  <div class="card" id="card">
+    
+
+    <section class="face front" aria-label="Frente de la invitación">
+      <div class="world">
+        <div class="w-layer w-arcade"><div class="stars"></div><div class="sun"></div><div class="floor"></div></div>
+        <div class="w-layer w-pixel"><i class="px-cloud c1"></i><i class="px-cloud c2"></i><div class="px-hills"></div><div class="px-hills front-hills"></div></div>
+        <div class="w-layer w-space"><div class="stars"></div><div class="planet"></div><div class="moon"></div>
+          <svg class="rocket" viewBox="0 0 26 48" aria-hidden="true"><path d="M13 0 C22 10 22 28 19 36 H7 C4 28 4 10 13 0Z" fill="#fff"/><circle cx="13" cy="16" r="4" fill="#12b5e8"/><path d="M7 30 L1 40 L7 38Z M19 30 L25 40 L19 38Z" fill="#ff4fa3"/><path d="M9 37 L13 48 L17 37Z" fill="#ffd23a"/></svg></div>
+        <div class="w-layer w-city"><div class="skyline"></div><div class="windows"></div><div class="road"></div></div>
+        <div class="w-layer w-retro"><div class="stars"></div>
+          <div class="retro-hud"><div>1UP<br><b>JOSE</b></div><div class="r">PUNTAJE<br><b>0007000</b><div class="lives"><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg></div></div></div>
+          <svg class="coin k1" viewBox="0 0 4 4" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ffd23a"/><rect x="2" y="0" width="1" height="1" fill="#ffd23a"/><rect x="0" y="1" width="1" height="1" fill="#ffd23a"/><rect x="1" y="1" width="1" height="1" fill="#ff9500"/><rect x="2" y="1" width="1" height="1" fill="#ff9500"/><rect x="3" y="1" width="1" height="1" fill="#ffd23a"/><rect x="0" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="2" width="1" height="1" fill="#ff9500"/><rect x="2" y="2" width="1" height="1" fill="#ff9500"/><rect x="3" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="3" width="1" height="1" fill="#ffd23a"/><rect x="2" y="3" width="1" height="1" fill="#ffd23a"/></svg><svg class="coin k2" viewBox="0 0 4 4" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ffd23a"/><rect x="2" y="0" width="1" height="1" fill="#ffd23a"/><rect x="0" y="1" width="1" height="1" fill="#ffd23a"/><rect x="1" y="1" width="1" height="1" fill="#ff9500"/><rect x="2" y="1" width="1" height="1" fill="#ff9500"/><rect x="3" y="1" width="1" height="1" fill="#ffd23a"/><rect x="0" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="2" width="1" height="1" fill="#ff9500"/><rect x="2" y="2" width="1" height="1" fill="#ff9500"/><rect x="3" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="3" width="1" height="1" fill="#ffd23a"/><rect x="2" y="3" width="1" height="1" fill="#ffd23a"/></svg><svg class="coin k3" viewBox="0 0 4 4" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ffd23a"/><rect x="2" y="0" width="1" height="1" fill="#ffd23a"/><rect x="0" y="1" width="1" height="1" fill="#ffd23a"/><rect x="1" y="1" width="1" height="1" fill="#ff9500"/><rect x="2" y="1" width="1" height="1" fill="#ff9500"/><rect x="3" y="1" width="1" height="1" fill="#ffd23a"/><rect x="0" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="2" width="1" height="1" fill="#ff9500"/><rect x="2" y="2" width="1" height="1" fill="#ff9500"/><rect x="3" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="3" width="1" height="1" fill="#ffd23a"/><rect x="2" y="3" width="1" height="1" fill="#ffd23a"/></svg><svg class="coin k4" viewBox="0 0 4 4" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ffd23a"/><rect x="2" y="0" width="1" height="1" fill="#ffd23a"/><rect x="0" y="1" width="1" height="1" fill="#ffd23a"/><rect x="1" y="1" width="1" height="1" fill="#ff9500"/><rect x="2" y="1" width="1" height="1" fill="#ff9500"/><rect x="3" y="1" width="1" height="1" fill="#ffd23a"/><rect x="0" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="2" width="1" height="1" fill="#ff9500"/><rect x="2" y="2" width="1" height="1" fill="#ff9500"/><rect x="3" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="3" width="1" height="1" fill="#ffd23a"/><rect x="2" y="3" width="1" height="1" fill="#ffd23a"/></svg>
+          <svg class="sprite" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true"><rect x="4" y="0" width="1" height="1" fill="#ffd23a"/><rect x="5" y="0" width="1" height="1" fill="#ffd23a"/><rect x="4" y="1" width="1" height="1" fill="#ffd23a"/><rect x="1" y="2" width="1" height="1" fill="#12b5e8"/><rect x="2" y="2" width="1" height="1" fill="#12b5e8"/><rect x="3" y="2" width="1" height="1" fill="#12b5e8"/><rect x="4" y="2" width="1" height="1" fill="#12b5e8"/><rect x="5" y="2" width="1" height="1" fill="#12b5e8"/><rect x="6" y="2" width="1" height="1" fill="#12b5e8"/><rect x="7" y="2" width="1" height="1" fill="#12b5e8"/><rect x="8" y="2" width="1" height="1" fill="#12b5e8"/><rect x="1" y="3" width="1" height="1" fill="#12b5e8"/><rect x="2" y="3" width="1" height="1" fill="#ffffff"/><rect x="3" y="3" width="1" height="1" fill="#ffffff"/><rect x="4" y="3" width="1" height="1" fill="#12b5e8"/><rect x="5" y="3" width="1" height="1" fill="#12b5e8"/><rect x="6" y="3" width="1" height="1" fill="#ffffff"/><rect x="7" y="3" width="1" height="1" fill="#ffffff"/><rect x="8" y="3" width="1" height="1" fill="#12b5e8"/><rect x="1" y="4" width="1" height="1" fill="#12b5e8"/><rect x="2" y="4" width="1" height="1" fill="#ffffff"/><rect x="3" y="4" width="1" height="1" fill="#1a1240"/><rect x="4" y="4" width="1" height="1" fill="#12b5e8"/><rect x="5" y="4" width="1" height="1" fill="#12b5e8"/><rect x="6" y="4" width="1" height="1" fill="#ffffff"/><rect x="7" y="4" width="1" height="1" fill="#1a1240"/><rect x="8" y="4" width="1" height="1" fill="#12b5e8"/><rect x="1" y="5" width="1" height="1" fill="#12b5e8"/><rect x="2" y="5" width="1" height="1" fill="#12b5e8"/><rect x="3" y="5" width="1" height="1" fill="#12b5e8"/><rect x="4" y="5" width="1" height="1" fill="#12b5e8"/><rect x="5" y="5" width="1" height="1" fill="#12b5e8"/><rect x="6" y="5" width="1" height="1" fill="#12b5e8"/><rect x="7" y="5" width="1" height="1" fill="#12b5e8"/><rect x="8" y="5" width="1" height="1" fill="#12b5e8"/><rect x="1" y="6" width="1" height="1" fill="#12b5e8"/><rect x="2" y="6" width="1" height="1" fill="#12b5e8"/><rect x="3" y="6" width="1" height="1" fill="#ff4fa3"/><rect x="4" y="6" width="1" height="1" fill="#ff4fa3"/><rect x="5" y="6" width="1" height="1" fill="#ff4fa3"/><rect x="6" y="6" width="1" height="1" fill="#ff4fa3"/><rect x="7" y="6" width="1" height="1" fill="#ff4fa3"/><rect x="8" y="6" width="1" height="1" fill="#12b5e8"/><rect x="2" y="7" width="1" height="1" fill="#12b5e8"/><rect x="3" y="7" width="1" height="1" fill="#12b5e8"/><rect x="4" y="7" width="1" height="1" fill="#12b5e8"/><rect x="5" y="7" width="1" height="1" fill="#12b5e8"/><rect x="6" y="7" width="1" height="1" fill="#12b5e8"/><rect x="7" y="7" width="1" height="1" fill="#12b5e8"/><rect x="1" y="8" width="1" height="1" fill="#3ff2b4"/><rect x="2" y="8" width="1" height="1" fill="#12b5e8"/><rect x="4" y="8" width="1" height="1" fill="#12b5e8"/><rect x="5" y="8" width="1" height="1" fill="#12b5e8"/><rect x="7" y="8" width="1" height="1" fill="#12b5e8"/><rect x="8" y="8" width="1" height="1" fill="#3ff2b4"/><rect x="2" y="9" width="1" height="1" fill="#3ff2b4"/><rect x="7" y="9" width="1" height="1" fill="#3ff2b4"/></svg><div class="px-ground"></div><div class="scan"></div></div>
+      </div><i class="hud tl"></i><i class="hud tr"></i><i class="hud bl"></i><i class="hud br"></i>
+      <div class="front-inner">
+        <div class="ribbon">ESTÁS INVITADO</div>
+        <div class="toprow">
+          <div class="datebadge"><div class="num">24 <small>OCT</small></div><div class="dow">SÁBADO</div></div>
+          <div class="hours" id="hours"></div>
+        </div>
+        <div class="hero">
+          <svg class="drop d1" viewBox="0 0 60 80" aria-hidden="true">
+            <path d="M4 28 Q30 -6 56 28 Z" fill="#3ff2b4" stroke="#fff" stroke-width="3"/>
+            <path d="M8 28 L22 52 M30 28 L30 52 M52 28 L38 52" stroke="#fff" stroke-width="2"/>
+            <rect x="16" y="50" width="28" height="24" rx="3" fill="#ff4fa3" stroke="#fff" stroke-width="3"/>
+            <rect x="27" y="50" width="6" height="24" fill="#ffd23a"/>
+          </svg>
+          <svg class="drop d2" viewBox="0 0 60 80" aria-hidden="true">
+            <path d="M4 28 Q30 -6 56 28 Z" fill="#12b5e8" stroke="#fff" stroke-width="3"/>
+            <path d="M8 28 L22 52 M30 28 L30 52 M52 28 L38 52" stroke="#fff" stroke-width="2"/>
+            <rect x="16" y="50" width="28" height="24" rx="3" fill="#ffd23a" stroke="#fff" stroke-width="3"/>
+            <rect x="27" y="50" width="6" height="24" fill="#ff4fa3"/>
+          </svg>
+          <svg class="emblem" viewBox="0 0 200 220" aria-hidden="true">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1a8"/><stop offset=".5" stop-color="#ffc400"/><stop offset="1" stop-color="#d47800"/></linearGradient>
+              <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a2bd6"/><stop offset="1" stop-color="#1a1240"/></linearGradient>
+            </defs>
+            <path d="M100 6 L186 38 L176 128 Q160 186 100 214 Q40 186 24 128 L14 38 Z" fill="url(#g1)" stroke="#fff" stroke-width="6"/>
+            <path d="M100 26 L166 51 L158 124 Q145 170 100 192 Q55 170 42 124 L34 51 Z" fill="url(#g2)"/>
+            <path d="M60 64 H142 L104 166 H76 L106 88 H60 Z" fill="#ffd23a" stroke="#fff" stroke-width="5" stroke-linejoin="round"/>
+            <path d="M126 70 l7 14 15 2 -11 10 3 15 -14 -8 -13 8 3 -15 -11 -10 15 -2z" fill="#ff4fa3" stroke="#fff" stroke-width="3" stroke-linejoin="round" transform="translate(8 -18) scale(.7)"/>
+          </svg>
+        </div>
+        <div class="banner"><div class="name">JOSE</div></div>
+        <div class="cumple">CUMPLE 7</div>
+        <div class="countdown" aria-live="off">
+          <div class="t">La partida empieza en</div>
+          <div class="digits" id="cd">
+            <div class="u"><b id="cdD">--</b><span>días</span></div>
+            <div class="u"><b id="cdH">--</b><span>horas</span></div>
+            <div class="u"><b id="cdM">--</b><span>min</span></div>
+            <div class="u"><b id="cdS">--</b><span>seg</span></div>
+          </div>
+        </div>
+        <div class="flip-tip">Da vuelta la tarjeta para ver la dirección</div>
+      </div>
+    </section>
+
+    <section class="face back" aria-label="Reverso de la invitación">
+      <div class="world">
+        <div class="w-layer w-arcade"><div class="stars"></div><div class="sun"></div><div class="floor"></div></div>
+        <div class="w-layer w-pixel"><i class="px-cloud c1"></i><i class="px-cloud c2"></i><div class="px-hills"></div><div class="px-hills front-hills"></div></div>
+        <div class="w-layer w-space"><div class="stars"></div><div class="planet"></div><div class="moon"></div>
+          <svg class="rocket" viewBox="0 0 26 48" aria-hidden="true"><path d="M13 0 C22 10 22 28 19 36 H7 C4 28 4 10 13 0Z" fill="#fff"/><circle cx="13" cy="16" r="4" fill="#12b5e8"/><path d="M7 30 L1 40 L7 38Z M19 30 L25 40 L19 38Z" fill="#ff4fa3"/><path d="M9 37 L13 48 L17 37Z" fill="#ffd23a"/></svg></div>
+        <div class="w-layer w-city"><div class="skyline"></div><div class="windows"></div><div class="road"></div></div>
+        <div class="w-layer w-retro"><div class="stars"></div>
+          <div class="retro-hud"><div>1UP<br><b>JOSE</b></div><div class="r">PUNTAJE<br><b>0007000</b><div class="lives"><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg><svg class="heart" viewBox="0 0 5 5" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="0" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="1" width="1" height="1" fill="#ff3b5c"/><rect x="0" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="4" y="2" width="1" height="1" fill="#ff3b5c"/><rect x="1" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="3" y="3" width="1" height="1" fill="#ff3b5c"/><rect x="2" y="4" width="1" height="1" fill="#ff3b5c"/></svg></div></div></div>
+          <svg class="coin k1" viewBox="0 0 4 4" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ffd23a"/><rect x="2" y="0" width="1" height="1" fill="#ffd23a"/><rect x="0" y="1" width="1" height="1" fill="#ffd23a"/><rect x="1" y="1" width="1" height="1" fill="#ff9500"/><rect x="2" y="1" width="1" height="1" fill="#ff9500"/><rect x="3" y="1" width="1" height="1" fill="#ffd23a"/><rect x="0" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="2" width="1" height="1" fill="#ff9500"/><rect x="2" y="2" width="1" height="1" fill="#ff9500"/><rect x="3" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="3" width="1" height="1" fill="#ffd23a"/><rect x="2" y="3" width="1" height="1" fill="#ffd23a"/></svg><svg class="coin k2" viewBox="0 0 4 4" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ffd23a"/><rect x="2" y="0" width="1" height="1" fill="#ffd23a"/><rect x="0" y="1" width="1" height="1" fill="#ffd23a"/><rect x="1" y="1" width="1" height="1" fill="#ff9500"/><rect x="2" y="1" width="1" height="1" fill="#ff9500"/><rect x="3" y="1" width="1" height="1" fill="#ffd23a"/><rect x="0" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="2" width="1" height="1" fill="#ff9500"/><rect x="2" y="2" width="1" height="1" fill="#ff9500"/><rect x="3" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="3" width="1" height="1" fill="#ffd23a"/><rect x="2" y="3" width="1" height="1" fill="#ffd23a"/></svg><svg class="coin k3" viewBox="0 0 4 4" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ffd23a"/><rect x="2" y="0" width="1" height="1" fill="#ffd23a"/><rect x="0" y="1" width="1" height="1" fill="#ffd23a"/><rect x="1" y="1" width="1" height="1" fill="#ff9500"/><rect x="2" y="1" width="1" height="1" fill="#ff9500"/><rect x="3" y="1" width="1" height="1" fill="#ffd23a"/><rect x="0" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="2" width="1" height="1" fill="#ff9500"/><rect x="2" y="2" width="1" height="1" fill="#ff9500"/><rect x="3" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="3" width="1" height="1" fill="#ffd23a"/><rect x="2" y="3" width="1" height="1" fill="#ffd23a"/></svg><svg class="coin k4" viewBox="0 0 4 4" shape-rendering="crispEdges" aria-hidden="true"><rect x="1" y="0" width="1" height="1" fill="#ffd23a"/><rect x="2" y="0" width="1" height="1" fill="#ffd23a"/><rect x="0" y="1" width="1" height="1" fill="#ffd23a"/><rect x="1" y="1" width="1" height="1" fill="#ff9500"/><rect x="2" y="1" width="1" height="1" fill="#ff9500"/><rect x="3" y="1" width="1" height="1" fill="#ffd23a"/><rect x="0" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="2" width="1" height="1" fill="#ff9500"/><rect x="2" y="2" width="1" height="1" fill="#ff9500"/><rect x="3" y="2" width="1" height="1" fill="#ffd23a"/><rect x="1" y="3" width="1" height="1" fill="#ffd23a"/><rect x="2" y="3" width="1" height="1" fill="#ffd23a"/></svg>
+          <svg class="sprite" viewBox="0 0 10 10" shape-rendering="crispEdges" aria-hidden="true"><rect x="4" y="0" width="1" height="1" fill="#ffd23a"/><rect x="5" y="0" width="1" height="1" fill="#ffd23a"/><rect x="4" y="1" width="1" height="1" fill="#ffd23a"/><rect x="1" y="2" width="1" height="1" fill="#12b5e8"/><rect x="2" y="2" width="1" height="1" fill="#12b5e8"/><rect x="3" y="2" width="1" height="1" fill="#12b5e8"/><rect x="4" y="2" width="1" height="1" fill="#12b5e8"/><rect x="5" y="2" width="1" height="1" fill="#12b5e8"/><rect x="6" y="2" width="1" height="1" fill="#12b5e8"/><rect x="7" y="2" width="1" height="1" fill="#12b5e8"/><rect x="8" y="2" width="1" height="1" fill="#12b5e8"/><rect x="1" y="3" width="1" height="1" fill="#12b5e8"/><rect x="2" y="3" width="1" height="1" fill="#ffffff"/><rect x="3" y="3" width="1" height="1" fill="#ffffff"/><rect x="4" y="3" width="1" height="1" fill="#12b5e8"/><rect x="5" y="3" width="1" height="1" fill="#12b5e8"/><rect x="6" y="3" width="1" height="1" fill="#ffffff"/><rect x="7" y="3" width="1" height="1" fill="#ffffff"/><rect x="8" y="3" width="1" height="1" fill="#12b5e8"/><rect x="1" y="4" width="1" height="1" fill="#12b5e8"/><rect x="2" y="4" width="1" height="1" fill="#ffffff"/><rect x="3" y="4" width="1" height="1" fill="#1a1240"/><rect x="4" y="4" width="1" height="1" fill="#12b5e8"/><rect x="5" y="4" width="1" height="1" fill="#12b5e8"/><rect x="6" y="4" width="1" height="1" fill="#ffffff"/><rect x="7" y="4" width="1" height="1" fill="#1a1240"/><rect x="8" y="4" width="1" height="1" fill="#12b5e8"/><rect x="1" y="5" width="1" height="1" fill="#12b5e8"/><rect x="2" y="5" width="1" height="1" fill="#12b5e8"/><rect x="3" y="5" width="1" height="1" fill="#12b5e8"/><rect x="4" y="5" width="1" height="1" fill="#12b5e8"/><rect x="5" y="5" width="1" height="1" fill="#12b5e8"/><rect x="6" y="5" width="1" height="1" fill="#12b5e8"/><rect x="7" y="5" width="1" height="1" fill="#12b5e8"/><rect x="8" y="5" width="1" height="1" fill="#12b5e8"/><rect x="1" y="6" width="1" height="1" fill="#12b5e8"/><rect x="2" y="6" width="1" height="1" fill="#12b5e8"/><rect x="3" y="6" width="1" height="1" fill="#ff4fa3"/><rect x="4" y="6" width="1" height="1" fill="#ff4fa3"/><rect x="5" y="6" width="1" height="1" fill="#ff4fa3"/><rect x="6" y="6" width="1" height="1" fill="#ff4fa3"/><rect x="7" y="6" width="1" height="1" fill="#ff4fa3"/><rect x="8" y="6" width="1" height="1" fill="#12b5e8"/><rect x="2" y="7" width="1" height="1" fill="#12b5e8"/><rect x="3" y="7" width="1" height="1" fill="#12b5e8"/><rect x="4" y="7" width="1" height="1" fill="#12b5e8"/><rect x="5" y="7" width="1" height="1" fill="#12b5e8"/><rect x="6" y="7" width="1" height="1" fill="#12b5e8"/><rect x="7" y="7" width="1" height="1" fill="#12b5e8"/><rect x="1" y="8" width="1" height="1" fill="#3ff2b4"/><rect x="2" y="8" width="1" height="1" fill="#12b5e8"/><rect x="4" y="8" width="1" height="1" fill="#12b5e8"/><rect x="5" y="8" width="1" height="1" fill="#12b5e8"/><rect x="7" y="8" width="1" height="1" fill="#12b5e8"/><rect x="8" y="8" width="1" height="1" fill="#3ff2b4"/><rect x="2" y="9" width="1" height="1" fill="#3ff2b4"/><rect x="7" y="9" width="1" height="1" fill="#3ff2b4"/></svg><div class="px-ground"></div><div class="scan"></div></div>
+      </div>
+      <i class="hud tl"></i><i class="hud tr"></i><i class="hud bl"></i><i class="hud br"></i>
+      <div class="back-inner">
+        <svg class="pin" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M50 6c-19 0-33 14-33 32 0 24 33 56 33 56s33-32 33-56C83 20 69 6 50 6z" fill="#ff4fa3" stroke="#1a1240" stroke-width="5"/>
+          <circle cx="50" cy="38" r="13" fill="#fff" stroke="#1a1240" stroke-width="5"/>
+        </svg>
+        <h2>¿Dónde es?</h2>
+        <div class="address">
+          <div class="street">Teniente Merino 670</div>
+          <a class="map-btn" id="mapBtn" href="https://www.google.com/maps/search/?api=1&amp;query=Teniente+Merino+670" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="vertical-align:-3px;margin-right:6px"><path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z" fill="#1a1240"/><circle cx="12" cy="9" r="2.6" fill="#ffd23a"/></svg>Abrir en Google Maps</a>
+        </div>
+        <p class="note"><strong>¡No faltes!</strong>Sábado 24 de octubre, de 16:00 a 19:00 hrs.<br>Te espero para la misión de cumpleaños más épica del año</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="hint">
+  <button class="btn" id="flipBtn" type="button">Dar vuelta</button>
+  <button class="btn alt" id="tiltBtn" type="button">Mover con el celular</button>
+</div>
+<div class="hint"><p>Arrastra la tarjeta con el dedo para girarla</p></div>
+
+
+<canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+
+<script>
+(function () {
+  // Horario: escríbelo aquí cuando lo tengas, ej. ['16:00','19:00']
+  var HORARIO = ['16:00', '19:00'];
+  if (HORARIO) document.getElementById('hours').innerHTML = 'DESDE LAS<b>' + HORARIO[0] + ' HRS</b>HASTA LAS<b>' + HORARIO[1] + ' HRS</b>';
+
+  // Bloques flotantes
+  var sky = document.getElementById('sky');
+  var colors = ['#ffd23a', '#ff7a00', '#ff4fa3', '#3ff2b4', '#12b5e8'];
+  for (var i = 0; i < 9; i++) {
+    var c = document.createElement('div');
+    c.className = 'cube';
+    var s = 18 + Math.random() * 34;
+    c.style.setProperty('--s', s + 'px');
+    c.style.setProperty('--c', colors[i % colors.length]);
+    c.style.setProperty('--d', (14 + Math.random() * 16) + 's');
+    c.style.left = (Math.random() * 92) + '%';
+    c.style.top = (Math.random() * 92) + '%';
+    c.style.animationDelay = (-Math.random() * 10) + 's, ' + (-Math.random() * 6) + 's';
+    for (var j = 0; j < 6; j++) c.appendChild(document.createElement('i'));
+    sky.appendChild(c);
+  }
+
+  // Rotación de la tarjeta
+  var card = document.getElementById('card');
+  var stage = document.getElementById('stage');
+  var rotY = -60, rotX = 10;          // posición actual
+  var targetY = 0, targetX = 0;      // hacia dónde va
+  var velY = 0, velX = 0;
+  var dragging = false, moved = false, lastX = 0, lastY = 0, lastT = 0;
+  var tiltX = 0, tiltY = 0, useTilt = false;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function clampX(v) { return Math.max(-35, Math.min(35, v)); }
+
+  stage.addEventListener('pointerdown', function (e) {
+    if (e.target.closest('a')) return;
+    dragging = true; moved = false;
+    lastX = e.clientX; lastY = e.clientY; lastT = performance.now();
+    velX = velY = 0;
+    stage.setPointerCapture(e.pointerId);
+  });
+  stage.addEventListener('pointermove', function (e) {
+    if (!dragging) return;
+    var dx = e.clientX - lastX, dy = e.clientY - lastY;
+    if (Math.abs(dx) + Math.abs(dy) > 3) moved = true;
+    var now = performance.now(), dt = Math.max(16, now - lastT);
+    targetY += dx * 0.6;
+    targetX = clampX(targetX - dy * 0.4);
+    velY = dx * 0.6 / dt * 16;
+    velX = -dy * 0.4 / dt * 16;
+    lastX = e.clientX; lastY = e.clientY; lastT = now;
+  });
+  function endDrag() {
+    if (!dragging) return;
+    dragging = false;
+    if (!moved) { flip(); return; }
+    // al soltar, se acomoda en la cara más cercana
+    var projected = targetY + velY * 12;
+    targetY = Math.round(projected / 180) * 180;
+    targetX = 0;
+  }
+  stage.addEventListener('pointerup', endDrag);
+  stage.addEventListener('pointercancel', endDrag);
+
+  function flip() {
+    targetY = Math.round(targetY / 180) * 180 + 180;
+    targetX = 0;
+    burst();
+  }
+  document.getElementById('flipBtn').addEventListener('click', flip);
+
+  // Movimiento con el giroscopio del celular
+  var tiltBtn = document.getElementById('tiltBtn');
+  function onOrient(e) {
+    if (e.gamma == null) return;
+    tiltY = Math.max(-25, Math.min(25, e.gamma)) * 0.9;
+    tiltX = Math.max(-25, Math.min(25, (e.beta || 0) - 45)) * -0.6;
+  }
+  tiltBtn.addEventListener('click', function () {
+    if (useTilt) {
+      useTilt = false; tiltX = tiltY = 0;
+      window.removeEventListener('deviceorientation', onOrient);
+      tiltBtn.textContent = 'Mover con el celular';
+      return;
+    }
+    function start() {
+      useTilt = true;
+      window.addEventListener('deviceorientation', onOrient);
+      tiltBtn.textContent = 'Dejar de mover';
+    }
+    if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      DeviceOrientationEvent.requestPermission().then(function (r) {
+        if (r === 'granted') start();
+        else { tiltBtn.textContent = 'Permiso no otorgado'; setTimeout(function(){ tiltBtn.textContent = 'Mover con el celular'; }, 2500); }
+      }).catch(function () { tiltBtn.textContent = 'No disponible'; });
+    } else if ('DeviceOrientationEvent' in window) {
+      start();
+    } else {
+      tiltBtn.textContent = 'No disponible';
+    }
+  });
+
+  var frontEl = document.querySelector('.front'), backEl = document.querySelector('.back'), lastFacing = null;
+  var t0 = performance.now();
+  function frame(now) {
+    var idle = (!dragging && !useTilt && !reduced) ? Math.sin((now - t0) / 1400) * 6 : 0;
+    var goalY = targetY + idle + (useTilt ? tiltY : 0);
+    var goalX = targetX + (useTilt ? tiltX : 0) + (!dragging && !useTilt && !reduced ? Math.cos((now - t0) / 1700) * 3 : 0);
+    var k = dragging ? 0.45 : 0.09;
+    rotY += (goalY - rotY) * k;
+    rotX += (goalX - rotX) * k;
+    card.style.transform = 'rotateX(' + rotX.toFixed(2) + 'deg) rotateY(' + rotY.toFixed(2) + 'deg)';
+    var facing = Math.cos(rotY * Math.PI / 180) >= 0;
+    if (facing !== lastFacing) {
+      frontEl.classList.toggle('is-hidden', !facing);
+      backEl.classList.toggle('is-hidden', facing);
+      lastFacing = facing;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  // Confeti
+  var cv = document.getElementById('confetti'), ctx = cv.getContext('2d');
+  var parts = [];
+  function resize() { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; }
+  resize(); addEventListener('resize', resize);
+  function burst() {
+    if (reduced) return;
+    var cx = innerWidth / 2, cy = innerHeight / 2;
+    for (var i = 0; i < 70; i++) {
+      var a = Math.random() * Math.PI * 2, sp = 4 + Math.random() * 8;
+      parts.push({ x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 5,
+        r: Math.random() * 6.28, vr: (Math.random() - .5) * .4,
+        w: 6 + Math.random() * 6, h: 10 + Math.random() * 8,
+        c: colors[(Math.random() * colors.length) | 0], life: 120 });
+    }
+  }
+  function draw() {
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    for (var i = parts.length - 1; i >= 0; i--) {
+      var p = parts[i];
+      p.vy += 0.25; p.vx *= 0.98; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life--;
+      if (p.life <= 0 || p.y > innerHeight + 30) { parts.splice(i, 1); continue; }
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
+      ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.r * 2)));
+      ctx.restore();
+    }
+    requestAnimationFrame(draw);
+
+  }
+  requestAnimationFrame(draw);
+
+  // Pantalla de inicio
+  var startEl = document.getElementById('start');
+  document.getElementById('playBtn').addEventListener('click', function () {
+    this.style.display = 'none';
+    document.getElementById('loading').classList.add('on');
+    requestAnimationFrame(function(){ document.getElementById('loadFill').style.width = '100%'; });
+    setTimeout(function(){ document.getElementById('loadText').textContent = '¡Listo! Entrando a la fiesta'; }, 1100);
+    setTimeout(function(){ startEl.classList.add('gone'); targetY = 0; burst(); }, 1600);
+  });
+
+  // Cuenta regresiva al 24 de octubre de 2026
+  var EVENTO = new Date(2026, 9, 24, HORARIO ? parseInt(HORARIO[0]) : 0, HORARIO ? parseInt(HORARIO[0].split(':')[1] || 0) : 0);
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function tick() {
+    var ms = EVENTO - new Date();
+    if (ms <= 0) {
+      document.querySelector('.countdown .t').textContent = '¡La partida es hoy!';
+      document.getElementById('cd').style.display = 'none';
+      return;
+    }
+    var sec = Math.floor(ms / 1000);
+    document.getElementById('cdD').textContent = Math.floor(sec / 86400);
+    document.getElementById('cdH').textContent = pad(Math.floor(sec % 86400 / 3600));
+    document.getElementById('cdM').textContent = pad(Math.floor(sec % 3600 / 60));
+    document.getElementById('cdS').textContent = pad(sec % 60);
+  }
+  tick(); setInterval(tick, 1000);
+
+  // Selector de fondos
+  document.querySelectorAll('.opt').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.body.dataset.bg = b.dataset.bg;
+      document.querySelectorAll('.opt').forEach(function (o) { o.setAttribute('aria-pressed', o === b ? 'true' : 'false'); });
+      targetX = 0;
+    });
+  });
+})();
+</script>
+</body>
+</html>
